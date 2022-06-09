@@ -48,3 +48,25 @@ Create chart name and version as used by the chart label.
 {{- print "networking.k8s.io/v1" -}}
 {{- end }}
 {{- end -}}
+
+{{- define "nextcloud.configHash" -}}
+{{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
+{{- end -}}
+
+{{/*
+Security context
+*/}}
+{{- define "nextcloud.securityContext" -}}
+{{- $defaultSecurityContext := .Values.nginx.enabled | ternary (dict "fsGroup" 82) (dict "fsGroup" 33) -}}
+{{ toYaml (mustMergeOverwrite $defaultSecurityContext (.Values.securityContext|default dict)) }}
+{{- end -}}
+
+{{/*
+Security context for non-root containers
+*/}}
+{{- define "nextcloud.securityContext.nonRoot" -}}
+{{- $values := index . 0 -}}
+{{- $override := index . 1|default dict -}}
+{{- $defaultSecurityContext := $values.Values.nginx.enabled | ternary (dict "fsGroup" 82 "runAsUser" 82) (dict "fsGroup" 33 "runAsUser" 33) -}}
+{{ toYaml (mustMergeOverwrite $defaultSecurityContext $override) }}
+{{- end -}}
