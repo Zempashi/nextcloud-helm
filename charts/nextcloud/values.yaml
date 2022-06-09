@@ -459,6 +459,43 @@ metrics:
       prometheus.io/port: "9205"
     labels: {}
 
+notifyPush:
+  enabled: true
+
+  image:
+    repository:
+    tag:
+    pullPolicy:
+  livenessProbe:
+  readinessProbe:
+    httpGet:
+      path: /test/remote/127.0.0.1
+      port: http
+  startupProbe:
+
+  checkBin:
+    enabled: true
+    image:
+      repository:
+      tag:
+      pullPolicy:
+
+  appInstall:
+    enabled: true
+    image:
+      repository:
+      tag:
+      pullPolicy:
+    restartPolicy: Never
+    toletations:
+
+
+  service:
+    port: 80
+  securityContext: {}
+  containerPort: 7867
+  affinity: {}
+
 rbac:
   enabled: false
   serviceaccount:

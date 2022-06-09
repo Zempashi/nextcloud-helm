@@ -1,0 +1,26 @@
+{{- if .Values.notifyPush.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nextcloud.notifyPush.fullname" . }}
+  labels:
+    {{- include "nextcloud.notifyPush.labels" . | nindent 4 }}
+    {{- with .Values.notifyPush.service.labels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.notifyPush.service.type }}
+  {{- if eq .Values.notifyPush.service.type "LoadBalancer" }}
+  loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+  - port: {{ .Values.notifyPush.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+    {{- if eq .Values.notifyPush.service.type "NodePort" }}
+    nodePort: {{ default "" .Values.notifyPush.service.nodePort }}
+    {{- end }}
+  selector:
+    {{- include  "nextcloud.notifyPush.selectorLabels" . | nindent 4 }}
+{{- end }}

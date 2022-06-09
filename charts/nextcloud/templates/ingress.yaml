@@ -38,6 +38,22 @@ spec:
           serviceName: {{ template "nextcloud.fullname" . }}
           servicePort: {{ .Values.service.port }}
           {{- end }}
+      {{- if .Values.notifyPush.enabled }}
+      - path: /push/
+        {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+        pathType: {{ .Values.ingress.pathType }}
+        {{- end }}
+        backend:
+          {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+          service:
+            name: {{ template "nextcloud.notifyPush.fullname" . }}
+            port:
+              number: {{ .Values.notifyPush.service.port }}
+          {{- else }}
+          serviceName: {{ template "nextcloud.notifyPush.fullname" . }}
+          servicePort: {{ .Values.notifyPush.service.port }}
+          {{- end }}
+      {{- end }}
 {{- if .Values.ingress.tls }}
   tls:
 {{ toYaml .Values.ingress.tls | indent 4 }}
